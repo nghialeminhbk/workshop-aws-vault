@@ -1,0 +1,127 @@
+[
+{
+	"uri": "//localhost:1313/",
+	"title": "Vault",
+	"tags": [],
+	"description": "",
+	"content": "Triển khai và làm việc với Vault trên môi trường AWS Tổng quan Trong bài lab này, bạn sẽ tìm hiểu cách triển khai Vault trên AWS và cách sử dụng Vault để quản lý và cấp phát AWS access key một cách an toàn, bảo mật.\nNội dung Giới thiệu Triển khai Vault trên AWS Sử dụng Vautl để quản lý và cấp phát AWS Access Key Dọn dẹp tài nguyên "
+},
+{
+	"uri": "//localhost:1313/3-usevault/3.1-initvault/",
+	"title": "Connect to Public Instance",
+	"tags": [],
+	"description": "",
+	"content": "\nGo to EC2 service management console. Click on Public Linux Instance. Click Actions. Click Security. Click Modify IAM role. At the Modify IAM role page. Click to select SSM-Role. Click Save. You will need to wait about 10 minutes before performing the next step. This time our EC2 instance will automatically register with the Session Manager.\nGo to the AWS Systems Manager service management console Drag the left menu slider down. Click Session Manager. Click Start Session. Then select Public Linux Instance and click Start session to access the instance. Terminal will appear on the browser. Testing with the command sudo tcpdump -nn port 22 and sudo tcpdump we will see no SSH traffic but only HTTPS traffic. Above, we have created a connection to the public instance without opening SSH port 22, for better security, avoiding any attack to the SSH port.\nOne disadvantage of the above method is that we have to open the Security Group outbound at port 443 to the internet. Since it\u0026rsquo;s a public instance, it probably won\u0026rsquo;t be a problem, but if you want extra security, you can block port 443 to the internet and still use the Session Manager. We will go through this in the private instance section below.\nYou can click terminate to end the currently connected session before proceeding to the next step.\n"
+},
+{
+	"uri": "//localhost:1313/1-introduce/",
+	"title": "Giới thiệu",
+	"tags": [],
+	"description": "",
+	"content": "Vault là một công cụ mã nguồn mở được phát triển bởi HashiCorp, giúp quản lý và bảo vệ các bí mật (secrets) trong các hệ thống và ứng dụng. Những bí mật này có thể là mật khẩu, API keys, certificates, tokens, hoặc bất kỳ dữ liệu nhạy cảm nào khác. Vault cung cấp các tính năng bảo mật mạnh mẽ, giúp quản lý chu kỳ sống của những bí mật này và giảm thiểu nguy cơ bị lộ thông tin.\nCác tính năng chính của Vault:\nBảo mật bí mật (Secrets Management): Vault cho phép lưu trữ, quản lý và truy xuất các bí mật một cách an toàn. Những bí mật này được mã hóa và có thể chỉ định quyền truy cập cụ thể cho từng người dùng hoặc dịch vụ.\nDynamic Secrets: Vault có thể tạo các bí mật tạm thời (dynamic secrets) và tự động thu hồi (revoke) chúng sau một thời gian xác định. Ví dụ, Vault có thể tạo credentials tạm thời để truy cập vào một cơ sở dữ liệu và thu hồi chúng sau khi hết phiên làm việc.\nEncryption as a Service: Vault cung cấp API mã hóa cho phép các ứng dụng mã hóa dữ liệu mà không cần biết cách xử lý khóa mã. Điều này giúp các ứng dụng dễ dàng tích hợp với Vault để bảo vệ dữ liệu.\nToken hóa (Tokenization): Vault có thể token hóa dữ liệu nhạy cảm, thay thế các thông tin nhạy cảm bằng các token tạm thời để bảo vệ dữ liệu gốc.\nKiểm soát truy cập và chính sách (Access Control and Policies): Vault sử dụng các chính sách xác định người dùng hoặc dịch vụ nào có thể truy cập vào các bí mật nào. Điều này đảm bảo rằng chỉ những người dùng hoặc dịch vụ được ủy quyền mới có thể truy cập vào dữ liệu nhạy cảm.\nAudit Logs: Mọi hoạt động truy cập hoặc thay đổi bí mật trong Vault đều được ghi lại, giúp dễ dàng theo dõi và kiểm tra lịch sử truy cập.\nHỗ trợ Multi-cloud và Microservices: Vault hoạt động tốt trong các môi trường đa đám mây (multi-cloud) và kiến trúc microservices, giúp quản lý bí mật và dữ liệu mã hóa trong các hệ thống phức tạp\nLợi ích của việc sử dụng Vault:\nBảo vệ thông tin nhạy cảm: Vault giúp mã hóa và quản lý các bí mật một cách an toàn, giảm nguy cơ bị rò rỉ thông tin. Quản lý chu kỳ sống của bí mật: Vault tự động hoá việc cấp, thu hồi và xoá bỏ các bí mật, đảm bảo chúng không tồn tại lâu hơn thời gian cần thiết. Dễ tích hợp: Vault hỗ trợ nhiều nền tảng và dịch vụ, dễ dàng tích hợp vào hệ thống hiện có. "
+},
+{
+	"uri": "//localhost:1313/2-deployvault/2.1-createvpc/",
+	"title": "Tạo VPC ",
+	"tags": [],
+	"description": "",
+	"content": "Tạo VPC Lab VPC Truy cập giao diện quản trị dịch vụ VPC Click Your VPC. Click Create VPC. Tại trang Create VPC. Tại mục Name tag điền Lab VPC. Tại mục IPv4 CIDR điền : 10.10.0.0/16. Click Create VPC. Tạo Internet Gateway Truy cập giao diện quản trị dịch vụ VPC Click Internet gateways Click Create internet gateway Tại trang Create internet gateway Tại mục Name tag điền Lab IGW. Click Create internet gateway "
+},
+{
+	"uri": "//localhost:1313/3-usevault/3.2-createuservault/",
+	"title": "Tạo người dùng trong Vault",
+	"tags": [],
+	"description": "",
+	"content": "Giờ ta đã có thể sử dụng các chức năng của Vault, tuy nhiên hiện tại ta chỉ có root token cho tài khoản root. Tài khoản này có đầy đủ tất cả các quyền nên hạn chế việc sử dụng tài khoản này khi làm việc với Vault \u0026ndash;\u0026gt; Do đó việc đầu tiên cần làm là tạo người dùng với các chính sách hạn chế.\nTạo người dùng trong Vault Dưới đây là các bước để tạo người dùng trong Vault với phương pháp xác thực User/Pass\nĐăng nhập vào Vault sử dụng root token (là token được khởi tạo ở bước init) vault login Bật phương pháp xác thực Userpass vault auth enable userpass Thêm người dùng với Userpass vault write auth/userpass/users/\u0026lt;username\u0026gt; password=\u0026lt;password\u0026gt; Tạo policy cho người dùng để cấp quyền truy cập và tạo aws scretes Tạo file policy (aws-policy.hcl) path \u0026#34;aws/*\u0026#34; {\rcapabilities = [\u0026#34;read\u0026#34;, \u0026#34;list\u0026#34;, \u0026#34;update\u0026#34;]\r} Nạp policy vào Vault vault policy write aws-policy aws-policy.hcl Đăng nhập với người dùng vừa tạo bằng Vault Cli vault login -method=userpass username=\u0026lt;username\u0026gt; password=\u0026lt;password\u0026gt; Đăng nhập với người dùng vừa tạo bằng UI Ta chọn phương thức xác thực là User/Pass Điền thông tin user, pass ta vừa tạo. "
+},
+{
+	"uri": "//localhost:1313/2-deployvault/2.2-createpublicsubnet/",
+	"title": "Tạo Public subnet",
+	"tags": [],
+	"description": "",
+	"content": "Tạo Public subnet Click Subnets. Click Create subnet. Tại trang Create subnet. Tại mục VPC ID click chọn Lab VPC. Tại mục Subnet name điền Lab Public Subnet. Tại mục Availability Zone chọn Availability zone đầu tiên. Tại mục IPv4 CIRD block điền 10.10.1.0/24. Kéo xuống cuối trang , click Create subnet.\nClick chọn Lab Public Subnet.\nClick Actions. Click Edit subnet settings. Click chọn Enable auto-assign public IPv4 address. Click Save. Tạo Internet Gateway Click Internet Gateways. Click Create internet gateway. Tại trang Create internet gateway. Tại mục Name tag điền Lab IGW. Click Create internet gateway. Sau khi tạo thành công, click Actions. Click Attach to VPC. Tại trang Attach to VPC. Tại mục Available VPCs chọn Lab VPC. Click Attach internet gateway. Kiểm tra quá trình attach thành công như hình dưới. Tạo NAT Gateway Truy cập giao diện quản trị dịch vụ VPC Click NAT gateways Click Create NAT gateway Tại trang Create NAT gateway Tại mục Name tag điền Lab NAT. Tại mục subnet, chọn public subnet ta vừa tạo Chọn Elastic IP (hoặc bấm Allocate Elastic IP) Click Create NAT gateway Tạo route table cho public subnet Tiếp theo chúng ta sẽ tạo một custom route table để gán vào Lab Public Subnet. Click Route Tables. Click Create route table. Tại trang Create route table. Tại mục Name, điền Lab Public RTB. Tại mục VPC, chọn Lab VPC. Click Create route table. Sau khi tạo route table thành công. Click Edit routes. Tại trang Edit routes. Click Add route. Tại mục Destination điền 0.0.0.0/0 Tại mục Target chọn Internet Gateway sau đó chọn Lab IGW. Click Save changes. Click tab Subnet associations. Click Edit subnet associations để tiến hành associate custom routable chúng ta vừa tạo vào Lab Public Subnet. Tại trang Edit subnet associations. Click chọn Lab Public Subnet. Click Save associations. Kiểm tra thông tin route table đã được associate với Lab Public Subnet và thông tin route đi internet đã được trỏ đến Internet Gateway như hình dưới. "
+},
+{
+	"uri": "//localhost:1313/2-deployvault/",
+	"title": "Triển khai Vault trên AWS",
+	"tags": [],
+	"description": "",
+	"content": "Ta sẽ triển khai Vault trên AWS dạng đơn giản nhất mà vẫn bảo đảm kết và an toàn bảo mật. Ta sẽ cần các thành phần sau:\n1 Private Subnet, 1 Public Subnet 1 NAT Gateway, 1 Internet Gateway. 1 Bastion intance ở Public subnet 1 Vault instance ở Private subnet. 1 ALB để có thể truy cập Vault từ ngoài Internet. Tổng quan kiến trúc sau khi hoàn tất các bước này sẽ là: Nội dung Chuẩn bị VPC và EC2 Instance Tạo IAM Role "
+},
+{
+	"uri": "//localhost:1313/3-usevault/",
+	"title": "Quản lý AWS Access Key",
+	"tags": [],
+	"description": "",
+	"content": "Trong bước này, chúng ta sẽ thực hiện các bước để quản lý AWS Access Key với Vault và cách tích hợp AWS Cli với Vault để lấy được thông tin xác thực AWS an toàn, bảo mật.\nNội dung 3.1. Tạo Kết nối đến máy chủ EC2 Public 3.2. Tạo Kết nối đến máy chủ EC2 Private\n"
+},
+{
+	"uri": "//localhost:1313/3-usevault/3.2-usevaultaccesskey-copy/",
+	"title": "Sử dụng Vault quản lý AWS Access Key",
+	"tags": [],
+	"description": "",
+	"content": "Tại bước này ta sẽ ứng dụng Vault để giải quyết bài toán quản lý AWS Access Key và tích hợp với AWS Cli hay Terraform,\u0026hellip;\nQuản lý AWS Access Key bằng Vault Bật và cấu hình AWS Secret Engine. Vault có một AWS Secrets Engine giúp ta cấp phát tạm thời AWS Access Key và Secret Key.\nBật AWS Secrets Engine vault secrets enable -path=aws aws Cấu hình thông tin xác thực AWS (tại đây bạn điền đầy đủ thông tin vào) vault write aws/config/root access_key=\u0026lt;AWS_ACCESS_KEY\u0026gt; secret_key=\u0026lt;AWS_SECRET_KEY\u0026gt; region=\u0026lt;AWS_REGION\u0026gt; Tạo role để cấp phát AccessKey tạm thời role: Tên của vai trò bạn tạo. aws_policy_arns: ARN của các quyền mà bạn muốn gán cho các key được tạo ra (ở đây sử dụng AdministratorAccess). vault write aws/roles/\u0026lt;role\u0026gt; credential_type=iam_user policy_arns=\u0026lt;aws_policy_arns\u0026gt; ví dụ:\nvault write aws/roles/admin-role credential_type=iam_user policy_arns=arn:aws:iam::aws:policy/AdministratorAccess Cấp phát AWS Access Key tạm thời\nvault read aws/creds/admin-role kết quả trả về như sau:\nKey Value --- ----- lease_id aws/creds/my-role/xxx lease_duration 1h lease_renewable true access_key AKIAIOSFODNN7EXAMPLE secret_key wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY security_token null Giờ ta có thể dùng thông tin access_key và secret_key để cấu hình AWS Cli\naws configure Nhập thông tin access_key và secret_key lấy từ Vault.\nĐể tự động hoá bước này ta có thể viết đoạn script để tự động hoá lấy Access Key và Secret Key từ Vault\n#!/bin/bash # Lấy Access Key và Secret Key từ Vault AWS_CREDS=$(vault read aws/creds/my-role -format=json) # Lấy các giá trị Access Key và Secret Key ACCESS_KEY=$(echo $AWS_CREDS | jq -r .data.access_key) SECRET_KEY=$(echo $AWS_CREDS | jq -r .data.secret_key) # Cấu hình AWS CLI aws configure set aws_access_key_id $ACCESS_KEY aws configure set aws_secret_access_key $SECRET_KEY echo \u0026#34;AWS CLI đã được cấu hình với Access Key tạm thời từ Vault.\u0026#34; Xác nhận AWS Cli đã được kết nối đến AWS\naws s3 list "
+},
+{
+	"uri": "//localhost:1313/2-deployvault/2.3-createprivatesubnet/",
+	"title": "Tạo Private subnet",
+	"tags": [],
+	"description": "",
+	"content": "Tạo Private subnet Click Subnets. Click Create subnet. Tại trang Create subnet. Tại mục VPC ID click chọn Lab VPC. Tại mục Subnet name điền Lab Private Subnet. Tại mục Availability Zone chọn Availability zone đầu tiên. Tại mục IPv4 CIRD block điền 10.10.2.0/24. Kéo xuống cuối trang , click Create subnet. Tạo Route table cho Private subnet Tại trang Create route table. Tại mục Name, điền Lab Private RTB. Tại mục VPC, chọn Lab VPC. Click Create route table. Sau khi tạo route table thành công. Click Edit routes. Tại trang Edit routes. Click Add route. Tại mục Destination điền 0.0.0.0/0 Tại mục Target chọn NAT Gateway sau đó chọn Lab NAT. Click Save changes. Click tab Subnet associations. Click Edit subnet associations để tiến hành associate custom routable chúng ta vừa tạo vào Lab Private Subnet. Tại trang Edit subnet associations. Click chọn Lab Public Subnet. Click Save associations. Bước tiếp theo chúng ta sẽ tạo các security group cần thiết cho bài lab.\n"
+},
+{
+	"uri": "//localhost:1313/4-cleanup/",
+	"title": "Dọn dẹp tài nguyên  ",
+	"tags": [],
+	"description": "",
+	"content": "Chúng ta sẽ tiến hành các bước sau để xóa các tài nguyên chúng ta đã tạo trong bài thực hành này.\nXóa EC2 instance Truy cập giao diện quản trị dịch vụ EC2\nClick Instances. Click chọn cả 2 instance Public Linux Instance và Private Windows Instance. Click Instance state. Click Terminate instance, sau đó click Terminate để xác nhận. Xóa VPC Truy cập vào giao diện quản trị dịch vụ VPC Click Your VPCs. Click chọn Lab VPC. Click Actions. Click Delete VPC. Tại ô confirm, điền delete để xác nhận, click Delete để thực hiện xóa Lab VPC và các tài nguyên liên quan. Tương tự xoá NAT Gateway "
+},
+{
+	"uri": "//localhost:1313/2-deployvault/2.4-createsecgroup/",
+	"title": "Tạo các security group",
+	"tags": [],
+	"description": "",
+	"content": "Tạo các security group Trong bước này chúng ta sẽ tiến hành tạo các security group được sử dụng cho các instance của chúng ta. Sẽ có 3 đối tượng cần tạo security group trong bài lab này:\nApplication Load Balancer Bastion Instance Vault Instance Tạo security group cho Bastion instance nằm trong public subnet Truy cập giao diện quản trị dịch vụ VPC Click Security Group. Click Create security group. Tại mục Security group name, điền Lab SG Bastion. Tại mục Description, điền SG Bastion. Tại mục VPC, click dấu X để chọn lại Lab VPC bạn đã tạo cho bài lab này. Thêm Inbound rule để cho phép SSH từ Internet vào Bastion\nGiữ nguyên Outbound rule, kéo chuột xuống phía dưới.\nClick Create security group. Tạo security group cho Vault instance nằm trong private subnet Sau khi tạo thành công security group cho Bastion instance nằm trong public subnet, click vào link Security Groups để quay trở lại danh sách Security groups. Click Create security group.\nTại mục Security group name, điền Lab SG Vault.\nTại mục Description, điền SG Vault. Tại mục VPC, click dấu X để chọn lại Lab VPC bạn đã tạo cho bài lab này. Thêm Inbound Rule Cho phép SSH từ Bastion Cho phép traffic từ Application Load Balancer Kéo chuột xuống phía dưới. Thêm Outbound rule cho phép kết nối tới Internet (All traffic | 0.0.0.0/0) Click Create security group. Tạo security group cho Application Load Balancer Trong bước này, chúng ta sẽ tạo security group cho Application Load Balancer. Mục đích Load Balancer này sẽ là route traffic từ Internet tới các Vault Instance \u0026ndash;\u0026gt; Để cho người dùng có thể sử dụng dịch vụ Vault. Sau khi tạo thành công security group cho Vault instance trong private subnet, click vào link Security Groups để quay trở lại danh sách Security groups. Click Create security group. Tại mục Security group name, điền Lab SG ALB. Tại mục Description, điền SG ALB. Tại mục VPC, click dấu X để chọn lại Lab VPC bạn đã tạo cho bài lab này. Thêm Inbound rules cho phép traffic từ Internet. (Allow TCP | 0.0.0.0/0)\nThêm Outbound rules\nXóa Outbound rule cho phép TCP 8200 đến Vault Instance. Click Create security group. Như vậy chúng ta đã tiến hành xong việc tạo các security group cần thiết cho các Bastion instance và Vault Instance.\n"
+},
+{
+	"uri": "//localhost:1313/2-deployvault/2.5-createalb/",
+	"title": "Tạo Application Load Balancer",
+	"tags": [],
+	"description": "",
+	"content": "\rALB trong Lab này ngoài tác dụng cân bằng tải, ta sẽ dùng nó như một forward proxy để người dùng có thể truy cập dịch vụ Vault từ bên ngoài Internet\nTạo Target Groups Truy cập dịch vụ EC2 và chọn Target group trên thanh menu. Tạo mới Target Group Chọn Create target group Tại trang Create target group Ở bước 1 Specify group details: Tại mục Choose a target type, ta chọn Instances Tại mục Target group name, điền tên LabTGVault Protocol để HTTP, Port là 8200 Chọn VPC là LabVPC Tại mục Health checks, để Health check protocol là HTTP và Health check path là /ui/ Ở bước 2 Register targets Chọn Lab Vault Instance Ports for selected instances ta điền 8200 Chọn Include as pending below Chọn Create target group Tạo Application Load Balancer Truy cập dịch vụ EC2 và chọn Load Balancers trên thanh menu. Tạo mới Load Balancer Chọn Create Application Load Balancer Tại trang Create Application Load Balancer Tại mục Load Balancer name, điền tên của Load Balancer \u0026ldquo;LabALB\u0026rdquo; Tại mục Network mapping, chọn VPC là LabVPC Tại mục Mapping, chọn 2 AZ trong đó phải có 1 AZ chứa public subnet, và private subnet có Vault Instance Tại mục Security Group, chọn security group \u0026ldquo;Lab SG ALB\u0026rdquo; ta vừa tạo ở các bước trước Tại mục Listeners and routing, ta thêm Listenr với cấu hình như sau: Protocol HTTP, Port 80 và chọn target group ta vừa tạo ở bước trên Kéo xuống dưới và chọn Create load balancer. "
+},
+{
+	"uri": "//localhost:1313/2-deployvault/2.6-createbastion/",
+	"title": "Tạo Bastion Instance",
+	"tags": [],
+	"description": "",
+	"content": " Truy cập giao diện quản trị dịch vụ EC2 Click Instances. Click Launch instances. Tại trang Launch instances Tại mục Name ta điền tên instance: \u0026ldquo;Lab Bastion\u0026rdquo; Tại mục Application and OS Image, chọn AMI Ubuntu Tại mục Instance type, chọn t2.micro Tại mục Key pair, chọn 1 key pair có sẵn hoặc tạo mới một key pair Tại mục Network setting, Chọn VPC là LabVPC Chọn Subnet là Lab Public subnet Chọn Auto-assign public IP là Enable Chọn Securitu group là Lab SG Bastion Mục Config storage để mặc định size root volume là 8Gib gp3 Kéo xuống dưới và chọn Launch Instance Tiếp theo chúng ta sẽ thực hiện tương tự để tạo 1 EC2 Vault chạy trong Private subnet.\n"
+},
+{
+	"uri": "//localhost:1313/2-deployvault/2.7-createvault/",
+	"title": "Tạo Vault Instance",
+	"tags": [],
+	"description": "",
+	"content": " Truy cập giao diện quản trị dịch vụ EC2 Click Instances. Click Launch instances. Tại trang Launch instances Tại mục Name ta điền tên instance: \u0026ldquo;Lab Bastion\u0026rdquo; Tại mục Application and OS Image, chọn AMI Ubuntu Tại mục Instance type, chọn t2.micro Tại mục Key pair, chọn 1 key pair có sẵn hoặc tạo mới một key pair Tại mục Network setting, Chọn VPC là LabVPC Chọn Subnet là Lab Private subnet Chọn Auto-assign public IP là Disable Chọn Securitu group là Lab SG Vault + Mục **Config storage** để mặc định size root volume là **20Gib gp3**\r+ Tại mục **User data**. Ta thêm nội dung file script sau để cấu hình, cài đặt Vault:\r#!/bin/bash\r# Cập nhật gói và nâng cấp hệ thống\rsudo apt-get update -y\rsudo apt-get upgrade -y\r# Cài đặt các gói phụ thuộc\rsudo apt-get install -y unzip curl\r# Tải và cài đặt Vault từ HashiCorp\rVAULT_VERSION=\u0026#34;1.14.0\u0026#34;\rcurl -O https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip\r# Giải nén Vault\runzip vault_${VAULT_VERSION}_linux_amd64.zip\r# Di chuyển Vault đến thư mục hệ thống\rsudo mv vault /usr/local/bin/\r# Cấp quyền thực thi\rsudo chmod +x /usr/local/bin/vault\r# Tạo thư mục cấu hình cho Vault\rsudo mkdir -p /etc/vault.d\r# Tạo file cấu hình cơ bản cho Vault\rcat \u0026lt;\u0026lt;EOF | sudo tee /etc/vault.d/vault.hcl\rstorage \u0026#34;file\u0026#34; {\rpath = \u0026#34;/opt/vault/data\u0026#34;\r}\rlistener \u0026#34;tcp\u0026#34; {\raddress = \u0026#34;0.0.0.0:8200\u0026#34;\rtls_disable = 1\r}\rui = true\rEOF\r# Tạo thư mục để lưu dữ liệu cho Vault\rsudo mkdir -p /opt/vault/data\r# Tạo service systemd cho Vault\rcat \u0026lt;\u0026lt;EOF | sudo tee /etc/systemd/system/vault.service\r[Unit]\rDescription=\u0026#34;HashiCorp Vault - A tool for managing secrets\u0026#34;\rDocumentation=https://www.vaultproject.io/\rAfter=network-online.target\rWants=network-online.target\r[Service]\rExecStart=/usr/local/bin/vault server -config=/etc/vault.d/vault.hcl\rExecReload=/bin/kill --signal HUP $MAINPID\rRestart=on-failure\rLimitNOFILE=65536\rStandardOutput=syslog\rStandardError=syslog\rSyslogIdentifier=vault\r[Install]\rWantedBy=multi-user.target\rEOF\r# Reload và khởi động Vault\rsudo systemctl daemon-reload\rsudo systemctl start vault\rsudo systemctl enable vault\r# Mở cổng tường lửa (nếu đang sử dụng UFW)\rsudo ufw allow 8200 Kéo xuống dưới và chọn Launch Instance Như vậy chúng ta đã thực hiện xong việc tạo EC2 Vault trên private subnet.\n"
+},
+{
+	"uri": "//localhost:1313/2-deployvault/2.8-result/",
+	"title": "Kết quả",
+	"tags": [],
+	"description": "",
+	"content": "Sau khi thực hiện theo các bước trên, ta đã triển khai được dịch vụ Vault cơ bản lên môi trường AWS. Kiểm tra dịch vụ Vault đã sẵn sàng chưa, ta truy cập vào đường dẫn DNS của Application Load Balancer. Định dạng của nó sẽ như thế này: LabALB-137099917.us-east-1.elb.amazonaws.com\n"
+},
+{
+	"uri": "//localhost:1313/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "//localhost:1313/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]
