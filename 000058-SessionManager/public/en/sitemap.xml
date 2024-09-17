@@ -15,18 +15,6 @@
                 href="//localhost:1313/"
                 />
   </url><url>
-    <loc>//localhost:1313/3-usevault/3.1-initvault/</loc>
-    <xhtml:link
-                rel="alternate"
-                hreflang="vi"
-                href="//localhost:1313/vi/3-usevault/3.1-initvault/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="//localhost:1313/3-usevault/3.1-initvault/"
-                />
-  </url><url>
     <loc>//localhost:1313/1-introduce/</loc>
     <xhtml:link
                 rel="alternate"
@@ -37,6 +25,18 @@
                 rel="alternate"
                 hreflang="en"
                 href="//localhost:1313/1-introduce/"
+                />
+  </url><url>
+    <loc>//localhost:1313/3-usevault/3.1-initvault/</loc>
+    <xhtml:link
+                rel="alternate"
+                hreflang="vi"
+                href="//localhost:1313/vi/3-usevault/3.1-initvault/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="//localhost:1313/3-usevault/3.1-initvault/"
                 />
   </url><url>
     <loc>//localhost:1313/2-deployvault/2.1-createvpc/</loc>
@@ -50,8 +50,6 @@
                 hreflang="en"
                 href="//localhost:1313/2-deployvault/2.1-createvpc/"
                 />
-  </url><url>
-    <loc>//localhost:1313/_index./</loc>
   </url><url>
     <loc>//localhost:1313/3-usevault/3.2-createuservault/</loc>
     <xhtml:link
