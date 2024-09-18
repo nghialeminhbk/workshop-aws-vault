@@ -10,7 +10,7 @@ chapter : false
 
  Trong bài lab này, bạn sẽ tìm hiểu cách triển khai Vault trên AWS và cách sử dụng Vault để quản lý và cấp phát AWS access key một cách an toàn, bảo mật.
 
-![ConnectPrivate](/images/arc-log.png) 
+![Vault](/images/vault-architecture.png)
 
 ### Nội dung
 

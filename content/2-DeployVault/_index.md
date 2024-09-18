@@ -15,7 +15,7 @@ Ta sẽ triển khai Vault trên AWS dạng đơn giản nhất mà vẫn bảo 
 
 
 Tổng quan kiến trúc sau khi hoàn tất các bước này sẽ là:
-![Vault architecture](/images/2.prerequisite/vault-architecture.png)
+![Vault architecture](/images/vault-architecture.png)
 
 ### Nội dung
   - [Chuẩn bị VPC và EC2 Instance](2.1-createec2/)
